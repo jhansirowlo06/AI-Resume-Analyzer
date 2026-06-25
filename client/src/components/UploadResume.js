@@ -24,7 +24,7 @@ formData.append("jobDescription", jobDescription);
       setLoading(true);
 
       const response = await axios.post(
-        "http://localhost:5000/api/documents/upload",
+        "https://ai-resume-analyzer-kur5.onrender.com/api/documents/upload",
         formData
       );
 
