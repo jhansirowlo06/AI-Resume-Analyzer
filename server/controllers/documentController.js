@@ -5,61 +5,100 @@ const model = require("../config/gemini");
 
 const uploadPDF = async (req, res) => {
   try {
-    console.log("REQ FILE =", req.file);
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Please upload a PDF file.",
+      });
+    }
 
     const dataBuffer = fs.readFileSync(req.file.path);
-
-    console.log("PDF reading started...");
-
     const pdfData = await pdfParse(dataBuffer);
 
+    // Save resume to MongoDB
     const newResume = new Resume({
       filename: req.file.filename,
       content: pdfData.text,
     });
 
     await newResume.save();
-    const jobDescription = req.body.jobDescription;
+
+    const jobDescription =
+      req.body.jobDescription || "Software Engineer";
 
     const prompt = `
-Analyze this resume against the following job description.
+You are an ATS Resume Expert.
+
+Analyze the following resume against the given Job Description.
 
 Job Description:
-${jobDescription || "General Software Engineer Role"}
+${jobDescription}
 
 Resume:
-${pdfData.text.substring(0, 3000)}
+${pdfData.text.substring(0, 2000)}
 
-Provide:
+Return ONLY plain text.
+
+Sections:
 
 1. Resume Summary
 2. Technical Skills
 3. Strengths
 4. Missing Skills
 5. Recommended Roles
-6. ATS Score
-7. Match Percentage with Job Description
-8. Suggestions to improve the resume
-
-Always provide a match percentage even if no job description is provided.
+6. ATS Score (/100)
+7. Match Percentage
+8. Resume Improvement Tips
 `;
 
-    const result = await model.generateContent([prompt]);
+    let result;
+
+    // Retry Gemini API (handles temporary 503 errors)
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        result = await model.generateContent(prompt);
+        break;
+      } catch (err) {
+        console.log(`Gemini Retry ${attempt}`);
+
+        if (attempt === 3) {
+          throw err;
+        }
+
+        await new Promise((resolve) =>
+          setTimeout(resolve, 3000)
+        );
+      }
+    }
+
     const analysis = result.response.text();
 
-    res.status(200).json({
-      message: "PDF uploaded and analyzed successfully",
+    // Delete uploaded PDF after processing
+    if (fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Resume analyzed successfully.",
       analysis,
     });
 
   } catch (error) {
-    console.error("FULL ERROR:", error);
-    console.error(error.message);
+    console.error("Gemini Error:", error);
 
-    res.status(500).json({
-      message: "Error extracting PDF text",
+    // Delete uploaded file even if analysis fails
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Gemini AI is temporarily busy. Please try again in a few seconds.",
     });
   }
 };
 
-module.exports = { uploadPDF };
+module.exports = {
+  uploadPDF,
+};

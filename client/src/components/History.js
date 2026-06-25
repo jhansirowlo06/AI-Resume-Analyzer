@@ -11,7 +11,7 @@ function History() {
   const fetchHistory = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/history"
+        "https://ai-resume-analyzer-kur5.onrender.com/api/history"
       );
 
       setHistory(response.data);
@@ -28,7 +28,7 @@ function History() {
   if (!confirmDelete) return;
 
   try {
-    await axios.delete("http://localhost:5000/api/history");
+    await axios.delete("https://ai-resume-analyzer-kur5.onrender.com/api/history");
 
     fetchHistory();
   } catch (error) {
