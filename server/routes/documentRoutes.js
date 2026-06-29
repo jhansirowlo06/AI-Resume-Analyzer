@@ -1,6 +1,9 @@
 const express = require("express");
 const multer = require("multer");
 const { uploadPDF } = require("../controllers/documentController");
+const {
+  improveResume,
+} = require("../controllers/resumeImproveController");
 
 const router = express.Router();
 
@@ -14,4 +17,5 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.post("/upload", upload.single("pdf"), uploadPDF);
+router.post("/improve", improveResume);
 module.exports = router;
