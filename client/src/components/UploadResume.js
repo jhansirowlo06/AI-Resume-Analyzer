@@ -10,7 +10,7 @@ import "react-circular-progressbar/dist/styles.css";
 
 function UploadResume() {
   const [file, setFile] = useState(null);
-  const [darkMode, setDarkMode] = useState(true);
+  //const [darkMode, setDarkMode] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const [jobDescription, setJobDescription] = useState("");
@@ -30,9 +30,9 @@ const [improving, setImproving] = useState(false);
   const [projects, setProjects] = useState([]);
 const [experience, setExperience] = useState([]);
 const [education, setEducation] = useState([]);
-const [certifications, setCertifications] = useState([]);
-const [softSkills, setSoftSkills] = useState([]);
-const [weaknesses, setWeaknesses] = useState([]);
+//const [certifications, setCertifications] = useState([]);
+//const [softSkills, setSoftSkills] = useState([]);
+//const [weaknesses, setWeaknesses] = useState([]);
   
   const handleUpload = async () => {
     if (!file) {
