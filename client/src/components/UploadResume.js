@@ -49,7 +49,7 @@ const [weaknesses, setWeaknesses] = useState([]);
       formData.append("jobDescription", jobDescription);
 
       const response = await axios.post(
-        "http://localhost:5000/api/documents/upload",
+        "https://ai-resume-analyzer-fd3a.onrender.com/api/documents/upload",
         formData
       );
       const data = response.data;
@@ -108,7 +108,7 @@ ${recommendedRoles.join(", ")}
 `;
 
     const response = await axios.post(
-      "http://localhost:5000/api/documents/improve",
+      "https://ai-resume-analyzer-fd3a.onrender.com/api/documents/improve",
       {
         resume: resumeText,
         jobDescription: jobDescription,
