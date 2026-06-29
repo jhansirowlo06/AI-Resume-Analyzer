@@ -71,9 +71,9 @@ const [education, setEducation] = useState([]);
       setProjects(data.projects || []);
 setExperience(data.experience || []);
 setEducation(data.education || []);
-setCertifications(data.certifications || []);
-setSoftSkills(data.softSkills || []);
-setWeaknesses(data.weaknesses || []);
+//setCertifications(data.certifications || []);
+//setSoftSkills(data.softSkills || []);
+//setWeaknesses(data.weaknesses || []);
 
       setLoading(false);
     } catch (error) {
